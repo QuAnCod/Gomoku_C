@@ -109,19 +109,50 @@ void displayBoardSimple(enum Stone arr[][15], int size)
 bool makeMove(enum Stone board[][15], int size, char *playerMove, bool isFirstPlayerTurn)
 {
     // BEGIN TODO
-    char temp[3];
-    strncpy(temp, playerMove + 1, 2);
-    long rot = strtol(temp, NULL, 10);
-    int row = rot - 1;
-    int col = playerMove[0] - 'a';
-    if (row < 0 || row > 14 || col < 0 || col > 14)
+    // The format of playerMove is "1a", "2b", "3c", ..., "15o"
+    // The first and sometimes second character is the row number, the next character is the column letter.
+    // The row number start from 1, the column letter start from 'a'.
+    // If the move is valid, update the board and return true.
+    // If the move is invalid, return false.
+
+    // Declare variables
+    int row, col;
+
+    // format the input
+    if (strlen(playerMove) > 3)
+    {
         return false;
-    if (board[14 - row][col] != NA)
-        return false;
-    if (isFirstPlayerTurn)
-        board[14 - row][col] = X;
+    }
+    else if (strlen(playerMove) == 3)
+    {
+        char rot[2];
+        strncpy(rot, playerMove, 2);
+        row = atoi(rot - 0);
+        col = playerMove[2] - 'a';
+    }
+    else if (strlen(playerMove) == 2)
+    {
+        row = playerMove[0] - '0';
+        col = playerMove[1] - 'a';
+    }
     else
-        board[14 - row][col] = O;
+    {
+        return false;
+    }
+
+    // Condition for a legal move
+    if (row > 15 || col > 15)
+    {
+        return false;
+    }
+    if (isFirstPlayerTurn)
+    {
+        board[15 - row][col] = X;
+    }
+    else
+    {
+        board[15 - row][col] = O;
+    }
     return true;
     // END TODO
 }
@@ -139,7 +170,7 @@ bool hasWon(enum Stone board[][15], int size, bool isFirstPlayerTurn)
     {
         for (int j = 0; j < size - 4; j++)
         {
-            // five in a row horizontally with the same stone
+            // five in a row horizontally with the same stone type (X or O)
             if (board[i][j] == stone && board[i][j + 1] == stone && board[i][j + 2] == stone && board[i][j + 3] == stone && board[i][j + 4] == stone)
             {
                 if (board[i][j + 5] == stone || board[i][j - 1] == stone)
@@ -185,7 +216,7 @@ bool hasWon(enum Stone board[][15], int size, bool isFirstPlayerTurn)
                 // check above or below, if one of the two is stone, return false (i = 5, j = 0) because this make six in a row which violate the winning conditions
                 if (board[i + 5][j] == stone || board[i - 1][j] == stone)
                     return false;
-                else
+                else //
                 {
                     // check above, if it is not stone, consider the below
                     if (board[i - 1][j] != stone)
